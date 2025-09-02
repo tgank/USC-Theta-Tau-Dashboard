@@ -197,52 +197,106 @@
 
 
   <script>
-      // ====== CONFIG ======
-      const masterCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSe8DRYLrA1sChNjnFJzaSLAIRMi3vM3ltR2kGF3BYdjjTsdMqW-_Txt8hXpQZF8ZxSH2pIxYmlvw34/pub?output=csv';
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSe8DRYLrA1sChNjnFJzaSLAIRMi3vM3ltR2kGF3BYdjjTsdMqW-_Txt8hXpQZF8ZxSH2pIxYmlvw34/pub?output=csv';
 
-      // Put the correct gid for each category sheet here:
-      const CATEGORY_SHEETS = {
-        Recruitment: '1905696049',
-        Social:      'REPLACE_WITH_SOCIAL_GID',
-        Professional:'REPLACE_WITH_PROFESSIONAL_GID',
-        Service:     'REPLACE_WITH_SERVICE_GID',
-      };
+    let tableData = [];
 
-      // Columns A..Q (0..16). Points columns: C,E,G,M,O,Q => 2,4,6,12,14,16
-      const POINT_COLS = new Set([2,4,6,12,14,16]);
-      const MAX_COL = 16;
+    fetch(sheetURL)
+      .then(response => response.text())
+      .then(csvText => {
+        const rows = csvText.trim().split('\n').map(row => row.split(','));
+        const tbody = document.querySelector('#pointsTable tbody');
+        tableData = rows;
 
-      // ====== UTILITIES ======
-      // CSV parser that handles quoted fields with commas
-      function parseCSV(text) {
-        const rows = [];
-        let cur = [], field = '', inQuotes = false;
-        for (let i = 0; i < text.length; i++) {
-          const c = text[i], next = text[i+1];
-          if (c === '"') {
-            if (inQuotes && next === '"') { field += '"'; i++; }
-            else { inQuotes = !inQuotes; }
-          } else if (c === ',' && !inQuotes) {
-            cur.push(field); field = '';
-          } else if (c === '\n' && !inQuotes) {
-            cur.push(field); field = '';
-            rows.push(cur); cur = [];
-          } else {
-            field += c;
+        for (let i = 1; i < rows.length; i++) {
+          const row = document.createElement('tr');
+          let hasLow = false;
+
+          rows[i].forEach((cell, idx) => {
+            const td = document.createElement('td');
+            const value = cell.trim();
+
+            if (idx === 0) {
+              td.textContent = value;
+              td.classList.add('name');
+            } else {
+              const num = parseInt(value);
+              td.textContent = isNaN(num) ? value : num;
+
+              if (!isNaN(num) && num < 12) {
+                td.classList.add('low');
+                hasLow = true;
+              } else if (!isNaN(num)) {
+                td.classList.add('high');
+              }
+            }
+            row.appendChild(td);
+          });
+
+          if (hasLow) {
+            row.firstChild.classList.add('name-low');
           }
+
+          // ✅ Add click handler
+          row.addEventListener('click', () => showModal(rows[i]));
+          tbody.appendChild(row);
         }
-        cur.push(field);
-        rows.push(cur);
-        return rows;
-      }
+      });
 
-      function toNumber(val) {
-        const n = parseFloat(String(val).trim());
-        return Number.isFinite(n) ? n : NaN;
-      }
+    function showModal(originalRow) {
+      const name = originalRow[0];
+      document.getElementById('popupName').textContent = name;
 
-      function csvUrlForGid(gid) {
-        return `https://docs.google.com/spreadsheets/d/e/2PACX-1vSe8DRYLrA1sChNjnFJzaSLAIRMi
+      const recruitmentSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSe8DRYLrA1sChNjnFJzaSLAIRMi3vM3ltR2kGF3BYdjjTsdMqW-_Txt8hXpQZF8ZxSH2pIxYmlvw34/pub?gid=1905696049&single=true&output=csv';
+
+      fetch(recruitmentSheetURL)
+        .then(response => response.text())
+        .then(csvText => {
+          const rows = csvText.trim().split('\n').map(r => r.split(','));
+          const headers = rows[0].slice(0, 17); // A to Q (17 columns)
+          const memberRow = rows.find(r => r[0].trim().toLowerCase() === name.trim().toLowerCase());
+
+          if (!memberRow) {
+            document.getElementById('popupRecruitment').innerHTML = 'No data found.';
+            return;
+          }
+
+          let content = "";
+
+          // Loop through columns A to Q (index 0 to 16)
+          for (let i = 1; i <= 16; i++) {
+            const colHeader = headers[i] || `(col ${i})`;
+            const cellValue = memberRow[i] ? memberRow[i].trim().toUpperCase() : "";
+
+            // Determine formatting based on rules
+            const isPointColumn = [2, 4, 6, 12, 14, 16].includes(i); // C, E, G, M, O, Q
+            const displayLabel = `<strong>${colHeader}</strong>`;
+
+            if (isPointColumn) {
+              // ➕ Always show points normally
+              content += `<div style="margin-left:1em;">Points: ${memberRow[i] || 0}</div>`;
+            } else if (cellValue === "TRUE" || cellValue === "FALSE") {
+              const color = cellValue === "TRUE" ? "green" : "red";
+              content += `<div style="color:${color}; font-weight:bold;">${displayLabel}</div>`;
+            } else if (!isNaN(cellValue)) {
+              const color = parseFloat(cellValue) > 0 ? "green" : "red";
+              content += `<div style="color:${color}; font-weight:bold;">${displayLabel}</div>`;
+            }
+          }
+
+          document.getElementById('popupRecruitment').innerHTML = content;
+          document.getElementById('popupSocial').innerHTML = content;
+          document.getElementById('popupProfessional').innerHTML = content;
+          document.getElementById('popupService').innerHTML = content;
+
+          document.getElementById('popupModal').style.display = 'flex';
+        })
+        .catch(error => {
+          console.error('Error loading recruitment data:', error);
+          document.getElementById('popupRecruitment').innerHTML = 'Error loading data.';
+        });
+    }
+
 
   </script>
 
