@@ -246,7 +246,7 @@
       const name = originalRow[0];
       document.getElementById('popupName').textContent = name;
 
-      const recruitmentSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSe8DRYLrA1sChNjnFJzaSLAIRMi3vM3ltR2kGF3BYdjjTsdMqW-_Txt8hXpQZF8ZxSH2pIxYmlvw34/pub?gid=1905696049&single=true&output=csv';
+      const recruitmentSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSe8DRYLrA1sChNjnFJzaSLAIRMi3vM3ltR2kGF3BYdjjTsdMqW-_Txt8hXpQZF8ZxSH2pIxYmlvw34/pub?output=csv';
 
       fetch(recruitmentSheetURL)
         .then(response => response.text())
