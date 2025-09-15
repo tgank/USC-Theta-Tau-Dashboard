@@ -1,169 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Theta Tau Attendance</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      position: relative;
-      overflow: hidden;
+      margin: 0; padding: 0;
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh; position: relative; overflow: hidden;
     }
-
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(rgba(245, 223, 135, 0.6), rgba(245, 223, 135, 0.8)),
-                  url('tt_shield.png') repeat;
-      background-size: 90px;
-      z-index: -1;
+    body::before{
+      content:""; position:absolute; inset:0;
+      background: linear-gradient(rgba(245,223,135,.6), rgba(245,223,135,.8)), url('tt_shield.png') repeat;
+      background-size: 90px; z-index:-1;
     }
-
-    .container {
-      width: 90%;
-      max-width: 800px;
-      background-color: #fff4c7;
-      border-radius: 16px;
-      padding: 10px;
-      box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
-      text-align: center;
+    .container{
+      width: 90%; max-width: 900px; background:#fff4c7; border-radius:16px; padding:12px;
+      box-shadow: 5px 5px 10px rgba(0,0,0,.1); text-align:center;
     }
-
-    h1 {
-      background-color: #fff2c7;
-      display: inline-block;
-      padding: 10px 20px;
-      border-radius: 20px;
-      box-shadow: 4px 4px 0px #d6b445;
-      color: #8b0000;
-      font-size: 2em;
-      margin-bottom: 10px;
+    h1{
+      background:#fff2c7; display:inline-block; padding:10px 20px; border-radius:20px;
+      box-shadow:4px 4px 0 #d6b445; color:#8b0000; font-size:2em; margin-bottom:10px;
     }
+    .subtitle{ color:#8b0000; margin: 16px 0 8px; }
+    .scroll-box{ max-height:420px; overflow-y:auto; background:#fff4d0; padding:10px; border-radius:8px; box-shadow:2px 2px 5px rgba(0,0,0,.2); }
+    table{ width:100%; border-collapse:collapse; }
+    th,td{ padding:10px; border-bottom:1px solid gold; text-align:left; color:#8b0000; }
+    th{ border-bottom:2px solid gold; position:sticky; top:0; background:#fff4d0; }
+    tr:hover td{ background:#fdf2c2; cursor:pointer; }
+    .name-low{ font-weight:bold; color:red !important; }
 
-    .subtitle {
-      color: #8b0000;
-      margin-bottom: 20px;
-      margin-top: 20px;
+    /* Modal */
+    #popupModal{
+      position:fixed; inset:0; background:rgba(0,0,0,.6);
+      display:none; justify-content:center; align-items:center; z-index:1000;
     }
-
-    .scroll-box {
-      max-height: 400px;
-      overflow-y: scroll;
-      background-color: #fff4d0;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    .popup-content{
+      background:#fff0c9; border-radius:16px; padding:20px; width:95%; max-width:700px;
+      max-height:90%; overflow-y:auto; box-shadow:0 4px 10px rgba(0,0,0,.3); position:relative; text-align:left;
     }
+    #closePopup{ position:absolute; right:20px; top:14px; font-size:28px; color:#8b0000; cursor:pointer; }
+    .popup-content h2{ color:#8b0000; margin:0 0 10px; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .legend{ font-size:.9rem; color:#6b0000; margin-bottom:8px; }
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+    .chip{
+      padding:8px 10px; border-radius:999px; background:#fffef3; border:1px solid #eee; font-family:monospace;
     }
-
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid gold;
-      text-align: center;
-      color: #8b0000;
-    }
-
-    th {
-      border-bottom: 2px solid gold;
-    }
-
-    tr:hover td {
-      background-color: #fdf2c2;
-    }
-
-    .low {
-      color: red !important;
-    }
-
-    .high {
-      color: green !important;
-    }
-
-    .name-low {
-      font-weight: bold;
-      color: red !important;
-    }
-
-    #popupModal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(0,0,0,0.6);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .popup-content {
-      background-color: #fff0c9;
-      border-radius: 16px;
-      padding: 20px;
-      width: 90%;
-      max-width: 600px;
-      max-height: 90%;
-      overflow-y: auto;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      position: relative;
-      text-align: left;
-    }
-
-    .popup-content h2 {
-      font-family: Arial, sans-serif;
-      color: #8b0000;
-      margin-top: 0;
-    }
-
-    #closePopup {
-      position: absolute;
-      right: 20px;
-      top: 20px;
-      font-size: 28px;
-      color: #8b0000;
-      cursor: pointer;
-    }
-
-    .popup-section {
-      background: #fff9db;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
-    }
-
-    .popup-row {
-      font-family: monospace;
-      background: #fffef3;
-      padding: 5px 10px;
-      border-radius: 4px;
-    }
-
+    .chip.green{ border-color:#3cab3c; color:#116611; background:#ebfaeb; }
+    .chip.red{ border-color:#e28b8b; color:#7b0d0d; background:#ffecec; }
+    .chip.black{ border-color:#888; color:#222; background:#f7f7f7; }
+    .section-title{ margin: 14px 0 6px; color:#8b0000; font-weight:bold; }
   </style>
 </head>
 <body>
   <div class="container">
     <a href="https://docs.google.com/document/d/1Uvp9evEQdUnysuExGtLnssGuFzhLr_4yJfv6UYCazJw/edit?usp=sharing" target="_blank"><h1>Theta Tau Attendance</h1></a>
-    <div class="subtitle">You must reach 12 pts in each category</div>
+    <div class="subtitle">Click a row to see that member’s checklist</div>
     <div class="scroll-box">
       <table id="pointsTable">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Social</th>
-            <th>Service</th>
-            <th>Professional</th>
-            <th>Recruitment</th>
+            <th style="width:55%;">Name</th>
+            <th>Total</th>
+            <th>Req Met?</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -171,133 +73,158 @@
     </div>
   </div>
 
-  <div id="popupModal" style="display:none;">
+  <!-- Modal -->
+  <div id="popupModal">
     <div class="popup-content">
       <span id="closePopup">&times;</span>
       <h2 id="popupName">Member Details</h2>
+      <div class="legend">
+        Green = checkbox checked or number in cell. If a number exists, it shows as <em>Header = #</em>.  
+        Order: Greens → Reds → <strong>Total</strong> (black) → <strong>Requirements</strong> (last).
+      </div>
 
-      <div class="popup-section">
-        <h3>Recruitment</h3>
-        <div class="popup-row" id="popupRecruitment"></div>
-      </div>
-      <div class="popup-section">
-        <h3>Social</h3>
-        <div class="popup-row" id="popupSocial"></div>
-      </div>
-      <div class="popup-section">
-        <h3>Professional</h3>
-        <div class="popup-row" id="popupProfessional"></div>
-      </div>
-      <div class="popup-section">
-        <h3>Service</h3>
-        <div class="popup-row" id="popupService"></div>
-      </div>
+      <div class="section-title">Green</div>
+      <div id="chipsGreen" class="chips"></div>
+
+      <div class="section-title">Red</div>
+      <div id="chipsRed" class="chips"></div>
+
+      <div class="section-title">Summary</div>
+      <div id="chipsSummary" class="chips"></div>
     </div>
   </div>
 
-
   <script>
-    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSe8DRYLrA1sChNjnFJzaSLAIRMi3vM3ltR2kGF3BYdjjTsdMqW-_Txt8hXpQZF8ZxSH2pIxYmlvw34/pub?output=csv';
-    let tableData = [];
+    const SHEET_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSe8DRYLrA1sChNjnFJzaSLAIRMi3vM3ltR2kGF3BYdjjTsdMqW-_Txt8hXpQZF8ZxSH2pIxYmlvw34/pub?output=csv';
 
-    fetch(sheetURL)
-      .then(response => response.text())
-      .then(csvText => {
-        const rows = csvText.trim().split('\n').map(row => row.split(','));
-        const tbody = document.querySelector('#pointsTable tbody');
-        tableData = rows;
+    let headers = [];
+    let rows = [];
 
-        for (let i = 1; i < rows.length; i++) {
-          const row = document.createElement('tr');
-          let hasLow = false;
-
-          rows[i].forEach((cell, idx) => {
-            const td = document.createElement('td');
-            const value = cell.trim();
-
-            if (idx === 0) {
-              td.textContent = value;
-              td.classList.add('name');
-            } else {
-              const num = parseInt(value);
-              td.textContent = isNaN(num) ? value : num;
-
-              if (!isNaN(num) && num < 12) {
-                td.classList.add('low');
-                hasLow = true;
-              } else if (!isNaN(num)) {
-                td.classList.add('high');
-              }
-            }
-            row.appendChild(td);
-          });
-
-          if (hasLow) {
-            row.firstChild.classList.add('name-low');
-          }
-
-          // ✅ Add click handler
-          row.addEventListener('click', () => showModal(rows[i]));
-          tbody.appendChild(row);
-        }
-      });
-
-    function showModal(originalRow) {
-      const name = originalRow[0];
-      document.getElementById('popupName').textContent = name;
-
-      const recruitmentSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSe8DRYLrA1sChNjnFJzaSLAIRMi3vM3ltR2kGF3BYdjjTsdMqW-_Txt8hXpQZF8ZxSH2pIxYmlvw34/pub?output=csv';
-
-      fetch(recruitmentSheetURL)
-        .then(response => response.text())
-        .then(csvText => {
-          const rows = csvText.trim().split('\n').map(r => r.split(','));
-          const headers = rows[0].slice(0, 17); // A to Q (17 columns)
-          const memberRow = rows.find(r => r[0].trim().toLowerCase() === name.trim().toLowerCase());
-
-          if (!memberRow) {
-            document.getElementById('popupRecruitment').innerHTML = 'No data found.';
-            return;
-          }
-
-          let content = "";
-
-          // Loop through columns A to Q (index 0 to 16)
-          for (let i = 1; i <= 16; i++) {
-            const colHeader = headers[i] || `(col ${i})`;
-            const cellValue = memberRow[i] ? memberRow[i].trim().toUpperCase() : "";
-
-            // Determine formatting based on rules
-            const isPointColumn = [2, 4, 6, 12, 14, 16].includes(i); // C, E, G, M, O, Q
-            const displayLabel = `<strong>${colHeader}</strong>`;
-
-            if (isPointColumn) {
-              // ➕ Always show points normally
-              content += `<div style="margin-left:1em;">Points: ${memberRow[i] || 0}</div>`;
-            } else if (cellValue === "TRUE" || cellValue === "FALSE") {
-              const color = cellValue === "TRUE" ? "green" : "red";
-              content += `<div style="color:${color}; font-weight:bold;">${displayLabel}</div>`;
-            } else if (!isNaN(cellValue)) {
-              const color = parseFloat(cellValue) > 0 ? "green" : "red";
-              content += `<div style="color:${color}; font-weight:bold;">${displayLabel}</div>`;
-            }
-          }
-
-          document.getElementById('popupRecruitment').innerHTML = content;
-          document.getElementById('popupSocial').innerHTML = content;
-          document.getElementById('popupProfessional').innerHTML = content;
-          document.getElementById('popupService').innerHTML = content;
-
-          document.getElementById('popupModal').style.display = 'flex';
-        })
-        .catch(error => {
-          console.error('Error loading recruitment data:', error);
-          document.getElementById('popupRecruitment').innerHTML = 'Error loading data.';
-        });
+    function parseCSV(text){
+      return text.trim().split('\n').map(r => r.split(',').map(c => c.trim()));
+    }
+    function isNumeric(val){
+      if (val === null || val === undefined || val === '') return false;
+      const n = Number(val);
+      return Number.isFinite(n);
+    }
+    function truthyWord(val){
+      if (!val) return false;
+      const v = val.toString().trim().toUpperCase();
+      return v === 'TRUE' || v === 'YES';
+    }
+    function falsyWord(val){
+      if (!val) return false;
+      const v = val.toString().trim().toUpperCase();
+      return v === 'FALSE' || v === 'NO';
     }
 
+    fetch(SHEET_CSV)
+      .then(r => r.text())
+      .then(text => {
+        const data = parseCSV(text);
+        headers = data[0];
+        rows = data.slice(1);
 
+        const nameIdx = 0;
+        const totalIdx = headers.findIndex(h => h && h.toLowerCase() === 'total');
+        const reqIdx   = headers.findIndex(h => h && h.toLowerCase().includes('requirement'));
+
+        const tbody = document.querySelector('#pointsTable tbody');
+        tbody.innerHTML = '';
+
+        rows.forEach(r => {
+          const tr = document.createElement('tr');
+
+          const tdName = document.createElement('td');
+          tdName.textContent = r[nameIdx] || '(no name)';
+          tr.appendChild(tdName);
+
+          const tdTotal = document.createElement('td');
+          tdTotal.textContent = totalIdx >= 0 ? (r[totalIdx] || '') : '';
+          tr.appendChild(tdTotal);
+
+          const tdReq = document.createElement('td');
+          tdReq.textContent = reqIdx >= 0 ? (r[reqIdx] || '') : '';
+          const reqVal = (r[reqIdx] || '').toString().trim().toUpperCase();
+          if (reqVal === 'YES' || reqVal === 'TRUE') tdReq.style.color = 'green';
+          else if (reqVal) tdReq.style.color = 'red';
+          tr.appendChild(tdReq);
+
+          tr.addEventListener('click', () => openModalForRow(r, totalIdx, reqIdx));
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => console.error('CSV load error:', err));
+
+    function openModalForRow(row, totalIdx, reqIdx){
+      document.getElementById('popupName').textContent = row[0] || 'Member';
+      const chipsGreen = document.getElementById('chipsGreen');
+      const chipsRed   = document.getElementById('chipsRed');
+      const chipsSummary = document.getElementById('chipsSummary');
+      chipsGreen.innerHTML = '';
+      chipsRed.innerHTML = '';
+      chipsSummary.innerHTML = '';
+
+      const greenItems = [];
+      const redItems = [];
+
+      // Build main chips, skipping TOTAL and REQUIREMENTS (handled later)
+      for (let i = 1; i < headers.length; i++){
+        if (i === totalIdx || i === reqIdx) continue; // handled after
+        const header = headers[i] || `Col ${i+1}`;
+        const raw = (row[i] ?? '').toString().trim();
+
+        if (truthyWord(raw) || isNumeric(raw)) {
+          const label = isNumeric(raw) ? `${header} = ${raw}` : header;
+          greenItems.push(label);
+        } else if (falsyWord(raw) || raw === '') {
+          redItems.push(header);
+        } else {
+          redItems.push(header); // any other non-empty text counts as red
+        }
+      }
+
+      // Greens first, then reds
+      greenItems.forEach(t => chipsGreen.appendChild(makeChip(t, 'green')));
+      redItems.forEach(t => chipsRed.appendChild(makeChip(t, 'red')));
+
+      // TOTAL (second-to-last), black and always shown if header exists
+      if (totalIdx >= 0) {
+        const totalHeader = headers[totalIdx] || 'Total';
+        const val = (row[totalIdx] ?? '').toString().trim();
+        const label = isNumeric(val) ? `${totalHeader} = ${val}` : totalHeader;
+        chipsSummary.appendChild(makeChip(label, 'black'));
+      }
+
+      // REQUIREMENTS (last), colored by value
+      if (reqIdx >= 0) {
+        const reqHeader = headers[reqIdx] || 'Requirements';
+        const raw = (row[reqIdx] ?? '').toString().trim();
+        const isGreen = truthyWord(raw);
+        const reqLabel = reqHeader; // show header only (no = value)
+        chipsSummary.appendChild(makeChip(reqLabel, isGreen ? 'green' : 'red'));
+      }
+
+      document.getElementById('popupModal').style.display = 'flex';
+    }
+
+    function makeChip(text, color){
+      const div = document.createElement('div');
+      div.className = `chip ${color}`;
+      div.textContent = text;
+      return div;
+    }
+
+    // Close modal handlers
+    document.getElementById('closePopup').addEventListener('click', () => {
+      document.getElementById('popupModal').style.display = 'none';
+    });
+    document.getElementById('popupModal').addEventListener('click', (e) => {
+      if (e.target.id === 'popupModal') {
+        document.getElementById('popupModal').style.display = 'none';
+      }
+    });
   </script>
-
 </body>
 </html>
